@@ -1,8 +1,8 @@
 # ATM
 
-Just a silly task for a autograde in mathematical modeling :3
+Just a silly task for a autograde in mathematical modeling exam :3
 
-The executable file is located on the path below: `bin\Release\SelfContained\ATM.exe`
+The executable file is located on the path below: `bin\Release\SingleFile\ATM.exe`
 
 **Requirements:**
  - .NET 8.0 Runtime for console apps
