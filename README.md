@@ -1,6 +1,9 @@
-Just silly task for self-credit for mathematical modeling.
+# ATM
 
-The executable file is located on the path bin\Release\SelfContained\Банкомат.exe
+Just a silly task for a autograde in mathematical modeling :3
 
-If for some reason it doesn't start, you should install .NET 8.0 Runtime for console apps at the link below:
-https://dotnet.microsoft.com/en-us/download/dotnet/8.0/runtime
+The executable file is located on the path below: `bin\Release\SelfContained\ATM.exe`
+
+**Requirements:**
+ - .NET 8.0 Runtime for console apps
+   - You can download it at this [**link**](https://dotnet.microsoft.com/en-us/download/dotnet/8.0/runtime)

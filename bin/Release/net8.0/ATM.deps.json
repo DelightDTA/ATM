@@ -6,15 +6,15 @@
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v8.0": {
-      "Банкомат/1.0.0": {
+      "ATM/1.0.0": {
         "runtime": {
-          "Банкомат.dll": {}
+          "ATM.dll": {}
         }
       }
     }
   },
   "libraries": {
-    "Банкомат/1.0.0": {
+    "ATM/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

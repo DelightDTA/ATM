@@ -2,6 +2,6 @@
 obj/
 *.csproj
 *.sln
-*.tar
+ATM.tar
 bin/Release/net8.0/win-x64/
 ChangeList.txt

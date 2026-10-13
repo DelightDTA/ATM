@@ -1,21 +1,22 @@
-﻿using System;
+﻿using System.Text;
+using System;
 using System.Text;
 using SHA256 = System.Security.Cryptography.SHA256;
 
-namespace Банкомат
+namespace ATM
 {
 	internal class Program
 	{
 		// Глобальные переменные
 		static int AccountChoice = new Random().Next(0, 3);
-		static string[] AccountNames = ["Иван Петров", "Мария Сидорова", "Алексей Козлов"];
-		static decimal[] Balances = [15000m, 8500m, 32000m];
+		static string[] AccountNames = { "Иван Петров", "Мария Сидорова", "Алексей Козлов" } ;
+		static decimal[] Balances = { 15000m, 8500m, 32000m };
 		static string[] History = new string[256];
 		static bool AdminPanelCanShow = true;
 		static int ActionChoice = -1;
 		static int ExitConfirm = -1;
 
-        static void Main()
+		static void Main()
 		{
 			// Настройки окна
 			Console.Title = "МОД СБЕРБАНК МНОГО ДЕНЕГ";
@@ -80,7 +81,7 @@ namespace Банкомат
 			Console.Write("Введите сумму для снятия (сумма должна быть кратна 100): ");
 
 			// Проверка валидности значения
-			if (!decimal.TryParse(Console.ReadLine(), out  decimal CashSum))
+			if (!decimal.TryParse(Console.ReadLine(), out decimal CashSum))
 			{
 				ErrorShow("Неверный ввод.");
 				return;
@@ -170,11 +171,11 @@ namespace Банкомат
 				}
 			}
 		}
-		
+
 		static void TransferBetweenAccouts()
 		{
 			int TransferAccount;
-            decimal TransferSum;
+			decimal TransferSum;
 			Console.WriteLine("===== ПЕРЕВОД МЕЖДУ СЧЕТАМИ =====");
 			Console.WriteLine($"Баланс: {Balances[AccountChoice]}");
 			Console.WriteLine();
@@ -256,7 +257,7 @@ namespace Банкомат
 				}
 			}
 		}
-		
+
 		static void OperationHistory()
 		{
 			Console.WriteLine("===== ИСТОРИЯ ОПЕРАЦИЙ =====");
@@ -306,12 +307,12 @@ namespace Банкомат
 				string Password = Console.ReadLine();
 				Console.WriteLine();
 
-                SHA256 sha256 = SHA256.Create();
-                byte[] Bytes = Encoding.UTF8.GetBytes(Password);
-                byte[] Hash = sha256.ComputeHash(Bytes);
-                sha256.Dispose();
-                string PasswordHash = BitConverter.ToString(Hash).ToLower().Replace("-", "");
-				
+				SHA256 sha256 = SHA256.Create();
+				byte[] Bytes = Encoding.UTF8.GetBytes(Password);
+				byte[] Hash = sha256.ComputeHash(Bytes);
+				sha256.Dispose();
+				string PasswordHash = BitConverter.ToString(Hash).ToLower().Replace("-", "");
+
 				if (PasswordHash == CorrectPasswordHash) AdminPanelDisabled = false;
 				else if (Password == "0")
 				{
@@ -376,8 +377,8 @@ namespace Банкомат
 					Console.WriteLine();
 					Console.WriteLine("====================");
 					Console.Write("Ваш выбор: ");
-                    OperationHistory = Convert.ToInt32(Console.ReadLine());
-                    if (OperationHistory == 0) continue;
+					OperationHistory = Convert.ToInt32(Console.ReadLine());
+					if (OperationHistory == 0) continue;
 					else
 					{
 						if (History[0] == null)
@@ -395,7 +396,7 @@ namespace Банкомат
 								if (History[i] != null) History[i] = null;
 								else break;
 							}
-						}	
+						}
 					}
 					Console.ReadKey();
 				}
@@ -417,8 +418,8 @@ namespace Банкомат
 					Console.WriteLine();
 					Console.WriteLine("====================");
 					Console.Write("Ваш выбор: ");
-                    BalanceChangeAccount = Convert.ToInt32(Console.ReadLine());
-                    if (BalanceChangeAccount == 0) continue;
+					BalanceChangeAccount = Convert.ToInt32(Console.ReadLine());
+					if (BalanceChangeAccount == 0) continue;
 					Console.WriteLine();
 					BalanceChangeAccount--;
 					Console.Write($"Введите новый баланс для аккаута \"{AccountNames[BalanceChangeAccount]}\": ");
@@ -437,19 +438,19 @@ namespace Банкомат
 
 		static void Exit()
 		{
-            Console.WriteLine("Вы уверены, что хотите выйти?");
-            Console.WriteLine("1 - да");
-            Console.WriteLine("0 - нет");
-            Console.WriteLine();
-            Console.WriteLine("====================");
-            Console.Write("Ваш выбор: ");
-            if (!int.TryParse(Console.ReadLine(), out ExitConfirm) || ExitConfirm < 0 || ExitConfirm > 1) ErrorShow("Неверный ввод.");
-            else if (ExitConfirm == 1) return;
-            else
-            {
-                ActionChoice = -1;
-                ExitConfirm = -1;
-            }
-        }
+			Console.WriteLine("Вы уверены, что хотите выйти?");
+			Console.WriteLine("1 - да");
+			Console.WriteLine("0 - нет");
+			Console.WriteLine();
+			Console.WriteLine("====================");
+			Console.Write("Ваш выбор: ");
+			if (!int.TryParse(Console.ReadLine(), out ExitConfirm) || ExitConfirm < 0 || ExitConfirm > 1) ErrorShow("Неверный ввод.");
+			else if (ExitConfirm == 1) return;
+			else
+			{
+				ActionChoice = -1;
+				ExitConfirm = -1;
+			}
+		}
 	}
 }
