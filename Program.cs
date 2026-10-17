@@ -1,55 +1,59 @@
 ﻿using System.Text;
-using System;
-using System.Text;
 using SHA256 = System.Security.Cryptography.SHA256;
 
 namespace ATM
 {
 	internal class Program
 	{
-		// Глобальные переменные
+		// Global variables
 		static int AccountChoice = new Random().Next(0, 3);
-		static string[] AccountNames = { "Иван Петров", "Мария Сидорова", "Алексей Козлов" } ;
+		static string[] AccountNames = { "Ivan Petrov", "Maria Sidorova", "Alexey Kozlov" } ;
 		static decimal[] Balances = { 15000m, 8500m, 32000m };
-		static string[] History = new string[256];
+		static string[] History = new string[2_000_000_000];
 		static bool AdminPanelCanShow = true;
 		static int ActionChoice = -1;
 		static int ExitConfirm = -1;
 
 		static void Main()
 		{
-			// Настройки окна
-			Console.Title = "МОД СБЕРБАНК МНОГО ДЕНЕГ";
+			// Window settings
+			Console.Title = "ATM";
 			Console.ForegroundColor = ConsoleColor.White;
 
-			// Основной цикл программы
+			string TimeOfDay = "";
+			if (DateTime.Now.Hour >= 5 && DateTime.Now.Hour < 11) TimeOfDay = "morning";
+			else if (DateTime.Now.Hour >= 11 && DateTime.Now.Hour < 17) TimeOfDay = "afternoon";
+			else if (DateTime.Now.Hour >= 17 && DateTime.Now.Hour < 23) TimeOfDay = "evening";
+			else TimeOfDay = "nigt";
+
+			// Main program loop
 			while (ActionChoice != 0 && ExitConfirm != 1)
 			{
-				// Начало программы
+				// Start program
 				Console.Clear();
-				Console.WriteLine($"===== Здавствуйте, {AccountNames[AccountChoice]} =====");
-				Console.WriteLine($"Баланс: {Balances[AccountChoice]}");
+				Console.WriteLine($"===== Good {TimeOfDay}, {AccountNames[AccountChoice]}! =====");
+				Console.WriteLine($"Your balance: {Balances[AccountChoice]}");
 				Console.WriteLine();
-				Console.WriteLine("Выберите действие:");
-				Console.WriteLine("1. Снять наличные");
-				Console.WriteLine("2. Пополнить счет");
-				Console.WriteLine("3. Перевод между счетами");
-				Console.WriteLine("4. История операций");
-				Console.WriteLine("0. Выход");
+				Console.WriteLine("Choose the action:");
+				Console.WriteLine("1. Withdrawn");
+				Console.WriteLine("2. Top up");
+				Console.WriteLine("3. Transfer between accounts");
+				Console.WriteLine("4. Operation hystory");
+				Console.WriteLine("0. Exit");
 				Console.WriteLine();
 				Console.WriteLine("====================");
-				Console.Write("Ваш выбор: ");
+				Console.Write("Your choice: ");
 
-				// Проверка валидности значения
+				// Value validity check
 				if (!int.TryParse(Console.ReadLine(), out ActionChoice))
 				{
 					ActionChoice = -1;
-					ErrorShow("Неверный ввод.");
+					ErrorShow("Invalid input.");
 					continue;
 				}
-				if ((ActionChoice < 0 || ActionChoice > 4) && ActionChoice != 1488) ErrorShow("Неверный ввод.");
+				if ((ActionChoice < 0 || ActionChoice > 4) && ActionChoice != 1488) ErrorShow("Invalid input.");
 				Console.Clear();
-				if (ActionChoice == 1) GetCash();
+				if (ActionChoice == 1) Withdrawn();
 				else if (ActionChoice == 2) TopUp();
 				else if (ActionChoice == 3) TransferBetweenAccouts();
 				else if (ActionChoice == 4) OperationHistory();
@@ -57,116 +61,104 @@ namespace ATM
 				else if (ActionChoice == 1488)
 				{
 					if (AdminPanelCanShow) AdminPanel();
-					else ErrorShow("Неверный ввод.");
+					else ErrorShow("Invalid input.");
 				}
 			}
 		}
 
-		static void ErrorShow(string ErrorMessage)
+		static void Withdrawn()
 		{
-			Console.ForegroundColor = ConsoleColor.Red;
-			Console.Write("Ошибка! ");
-			Console.ForegroundColor = ConsoleColor.White;
-			Console.WriteLine(ErrorMessage);
+            Console.WriteLine("===== WITHDRAWN =====");
+			Console.WriteLine($"Balance: {Balances[AccountChoice]}");
 			Console.WriteLine();
-			Console.Write("Нажмите Enter, чтобы начать сначала...");
-			Console.ReadKey();
-		}
+			Console.Write("Enter the withdrawal amount (the amount must be a multiple of 100): ");
 
-		static void GetCash()
-		{
-			Console.WriteLine("===== СНЯТИЕ НАЛИЧНЫХ =====");
-			Console.WriteLine($"Баланс: {Balances[AccountChoice]}");
-			Console.WriteLine();
-			Console.Write("Введите сумму для снятия (сумма должна быть кратна 100): ");
-
-			// Проверка валидности значения
-			if (!decimal.TryParse(Console.ReadLine(), out decimal CashSum))
+            // Value validity check
+            if (!decimal.TryParse(Console.ReadLine(), out decimal WithdrawnAmount))
 			{
-				ErrorShow("Неверный ввод.");
+				ErrorShow("Invalid input.");
 				return;
 			}
-			if (CashSum < 0)
+			if (WithdrawnAmount < 0)
 			{
-				ErrorShow("Вы не можете снять отрицательную сумму.");
+				ErrorShow("You cannot withdraw a negative amount..");
 				return;
 			}
-			if (CashSum % 100 != 0)
+			if (WithdrawnAmount % 100 != 0)
 			{
-				ErrorShow("Сумма должна быть кратна 100.");
+				ErrorShow("The amount must be a multiple of 100.");
 				return;
 			}
-			if (CashSum > Balances[AccountChoice])
+			if (WithdrawnAmount > Balances[AccountChoice])
 			{
-				ErrorShow("Недостаточно средств.");
+				ErrorShow("Insufficient funds.");
 				return;
 			}
 
-			// Успешное снятие наличных
-			Balances[AccountChoice] -= CashSum;
+            // Successful cash withdrawal
+            Balances[AccountChoice] -= WithdrawnAmount;
 			Console.Clear();
-			Console.WriteLine("===== СНЯТИЕ НАЛИЧНЫХ =====");
-			Console.WriteLine($"Баланс: {Balances[AccountChoice]}");
-			Console.WriteLine();
-			Console.WriteLine($"Введите сумму для снятия (сумма должна быть кратна 100): {CashSum}");
+            Console.WriteLine("===== WITHDRAWN =====");
+            Console.WriteLine($"Balance: {Balances[AccountChoice]}");
+            Console.WriteLine();
+            Console.WriteLine($"Enter the withdrawal amount (the amount must be a multiple of 100): {WithdrawnAmount}");
 			Console.ForegroundColor = ConsoleColor.Green;
-			Console.WriteLine($"Вы успешно сняли {CashSum} рублей.");
+			Console.WriteLine($"You have successfully withdrawn {WithdrawnAmount}.");
 			Console.ForegroundColor = ConsoleColor.White;
 			Console.WriteLine();
-			Console.Write("Нажмите Enter для продолжения...");
+			Console.Write("Press Enter to continue...");
 			Console.ReadKey();
 
-			// Запись операции в историю
-			for (int i = 0; i < 256; i++)
+			// Record operation in history
+			for (int i = 0; i < History.Length; i++)
 			{
 				if (History[i] == null)
 				{
-					History[i] = $"[{DateTime.Now.ToLongTimeString()}] Снятие -{CashSum},00 Р. (остаток: {Balances[AccountChoice]})";
-					break;
+                    History[i] = $"[{DateTime.Now.ToLongTimeString()}] Withdrawn -{WithdrawnAmount},00. (balance of funds: {Balances[AccountChoice]})";
+                    break;
 				}
 			}
 		}
 
 		static void TopUp()
 		{
-			decimal TopUpSum;
-			Console.WriteLine("===== ПОПОЛНЕНИЕ СЧЕТА =====");
-			Console.WriteLine($"Баланс: {Balances[AccountChoice]}");
+            Console.WriteLine("===== TOP UP =====");
+			Console.WriteLine($"Balance: {Balances[AccountChoice]}");
 			Console.WriteLine();
-			Console.Write("Введите сумму для пополнения: ");
+			Console.Write("Enter the amount to be topped up: ");
 
-			// Проверка валидности значения
-			if (!decimal.TryParse(Console.ReadLine(), out TopUpSum))
+            // Value validity check
+            if (!decimal.TryParse(Console.ReadLine(), out decimal TopUpAmount))
 			{
-				ErrorShow("Неверный ввод.");
+				ErrorShow("Invalid input.");
 				return;
 			}
-			if (TopUpSum < 0)
+			if (TopUpAmount < 0)
 			{
-				ErrorShow("Вы не можете пополнить счет на сумму меньше чем 0 рублей.");
+				ErrorShow("You can't top up the account for an amount less than 0.");
 				return;
 			}
 
-			// Успешное пополнение счета
-			Balances[AccountChoice] += TopUpSum;
+            // Successful account top up
+            Balances[AccountChoice] += TopUpAmount;
 			Console.Clear();
-			Console.WriteLine("===== ПОПОЛНЕНИЕ СЧЕТА =====");
-			Console.WriteLine($"Баланс: {Balances[AccountChoice]}");
+			Console.WriteLine("===== TOP UP =====");
+			Console.WriteLine($"Balance: {Balances[AccountChoice]}");
 			Console.WriteLine();
-			Console.WriteLine($"Введите сумму для пополнения: {TopUpSum}");
+			Console.WriteLine($"Enter the amount to be topped up: {TopUpAmount}");
 			Console.ForegroundColor = ConsoleColor.Green;
-			Console.WriteLine($"Вы успешно пополнили счет на {TopUpSum} рублей.");
+			Console.WriteLine($"You have successfully topped up your account by {TopUpAmount}.");
 			Console.ForegroundColor = ConsoleColor.White;
 			Console.WriteLine();
-			Console.Write("Нажмите Enter для продолжения...");
+			Console.Write("Press Enter to continue...");
 			Console.ReadKey();
 
-			// Запись операции в историю
-			for (int i = 0; i < 256; i++)
+            // Record operation in history
+            for (int i = 0; i < 256; i++)
 			{
 				if (History[i] == null)
 				{
-					History[i] = $"[{DateTime.Now.ToLongTimeString()}] Пополнение +{TopUpSum},00 Р. (остаток: {Balances[AccountChoice]})";
+					History[i] = $"[{DateTime.Now.ToLongTimeString()}] Top Up +{TopUpAmount},00. (balance of funds: {Balances[AccountChoice]})";
 					break;
 				}
 			}
@@ -174,85 +166,79 @@ namespace ATM
 
 		static void TransferBetweenAccouts()
 		{
-			int TransferAccount;
-			decimal TransferSum;
-			Console.WriteLine("===== ПЕРЕВОД МЕЖДУ СЧЕТАМИ =====");
-			Console.WriteLine($"Баланс: {Balances[AccountChoice]}");
+			Console.WriteLine("===== TRANSFER BETWEEN ACCOUNTS =====");
+			Console.WriteLine($"Balance: {Balances[AccountChoice]}");
 			Console.WriteLine();
-			Console.WriteLine("Выберите счет для перевода:");
+			Console.WriteLine("Select the account for the transfer:");
 
-			// Показ всех счетов, кроме текущего
-			for (int i = 0; i < 3; i++)
-			{
-				if (i != AccountChoice) Console.WriteLine($"{i + 1}. {AccountNames[i]}");
-			}
-			Console.WriteLine("0. Выход");
+            // Display of all accounts except the current one.
+            for (int i = 0; i < 3; i++) if (i != AccountChoice) Console.WriteLine($"{i + 1}. {AccountNames[i]}");
+			Console.WriteLine("0. Exit");
 			Console.WriteLine();
 
-			// Ввод значений и проверка их валидности
-			Console.Write("Ваш выбор: ");
-			if (!int.TryParse(Console.ReadLine(), out TransferAccount))
+            // Entering values and checking their validity
+            Console.Write("Your choice: ");
+			if (!int.TryParse(Console.ReadLine(), out int TransferAccount))
 			{
-				ErrorShow("Неверный ввод.");
+				ErrorShow("Invalid input.");
 				return;
 			}
 			TransferAccount--;
+			if (TransferAccount < -1 || TransferAccount > 2)
+			{
+				ErrorShow("Such an account doesn't exist.");
+				return;
+			}
 			if (TransferAccount == AccountChoice)
 			{
-				ErrorShow("Вы не можете перевести средства на тот же счет.");
+				ErrorShow("You can't transfer funds to the same account.");
 				return;
 			}
-			if ((TransferAccount < -1 || TransferAccount > 2))
+			Console.Write("Enter the transfer amount: ");
+			if (!decimal.TryParse(Console.ReadLine(), out decimal TransferSum))
 			{
-				ErrorShow("Такого счета не существует.");
-				return;
-			}
-			if (TransferAccount == -1) return;
-			Console.Write("Введите сумму для перевода: ");
-			if (!decimal.TryParse(Console.ReadLine(), out TransferSum))
-			{
-				ErrorShow("Неверный ввод.");
+				ErrorShow("Invalid input.");
 				return;
 			}
 			if (TransferSum < 0)
 			{
-				ErrorShow("Вы не можете перевести отрицательную сумму.");
+				ErrorShow("You can't transfer a negative amount.");
 				return;
 			}
 			if (TransferSum > Balances[AccountChoice])
 			{
-				ErrorShow("Недостаточно средств.");
+				ErrorShow("Insufficient funds.");
 				return;
 			}
 
-			// Успешный перевод между счетами
-			Balances[AccountChoice] -= TransferSum;
+            // Successful transfer between accounts
+            Balances[AccountChoice] -= TransferSum;
 			Balances[TransferAccount] += TransferSum;
 			Console.Clear();
-			Console.WriteLine("===== ПЕРЕВОД МЕЖДУ СЧЕТАМИ =====");
-			Console.WriteLine($"Баланс: {Balances[AccountChoice]}");
+			Console.WriteLine("===== TRANSFER BETWEEN ACCOUNTS =====");
+			Console.WriteLine($"Balance: {Balances[AccountChoice]}");
 			Console.WriteLine();
-			Console.WriteLine("Выберите счет для перевода:");
+			Console.WriteLine("Select the account for the transfer:");
 			for (int i = 0; i < 3; i++)
 			{
 				if (i != AccountChoice) Console.WriteLine($"{i + 1}. {AccountNames[i]}");
 			}
 			Console.WriteLine();
-			Console.WriteLine($"Ваш выбор: {TransferAccount + 1}");
-			Console.WriteLine($"Введите сумму для перевода: {TransferSum}");
+			Console.WriteLine($"Your choice: {TransferAccount + 1}");
+			Console.WriteLine($"Enter the transfer amount: {TransferSum}");
 			Console.ForegroundColor = ConsoleColor.Green;
-			Console.WriteLine($"Вы успешно перевели {TransferSum} на счет \"{AccountNames[TransferAccount]}\".");
+			Console.WriteLine($"You have successfully transferred {TransferSum} to the account \"{AccountNames[TransferAccount]}\".");
 			Console.ForegroundColor = ConsoleColor.White;
 			Console.WriteLine();
-			Console.Write("Нажмите Enter для продолжения...");
+			Console.Write("Press Enter to continue...");
 			Console.ReadKey();
 
-			// Запись операции в историю
-			for (int i = 0; i < 256; i++)
+            // Record operation in history
+            for (int i = 0; i < 256; i++)
 			{
 				if (History[i] == null)
 				{
-					History[i] = $"[{DateTime.Now.ToLongTimeString()}] Перевод -{TransferSum},00 Р. --> {AccountNames[TransferAccount]} (остаток: {Balances[AccountChoice]})";
+					History[i] = $"[{DateTime.Now.ToLongTimeString()}] Transfer -{TransferSum},00. --> {AccountNames[TransferAccount]} (balance of funds: {Balances[AccountChoice]})";
 					break;
 				}
 			}
@@ -260,19 +246,20 @@ namespace ATM
 
 		static void OperationHistory()
 		{
-			Console.WriteLine("===== ИСТОРИЯ ОПЕРАЦИЙ =====");
-			if (History[0] == null)
-			{
+			Console.WriteLine("===== OPERATION HISTORY =====");
+			if (History[0] == null) ErrorShow("There are no operations yet..");
+
+            /*{
 				Console.ForegroundColor = ConsoleColor.Red;
-				Console.WriteLine("Операций пока нет.");
+				Console.WriteLine();
 				Console.ForegroundColor = ConsoleColor.White;
 				Console.WriteLine();
-				Console.Write("Нажмите Enter для продолжения...");
+				Console.Write("Press Enter to continue...");
 				Console.ReadKey();
 				return;
-			}
-			else
-			{
+			}*/
+            else
+            {
 				for (int i = 0; i < 256; i++)
 				{
 					if (History[i] == null) break;
@@ -280,11 +267,22 @@ namespace ATM
 				}
 			}
 			Console.WriteLine();
-			Console.Write("Нажмите Enter для продолжения...");
+			Console.Write("Press Enter to continue...");
 			Console.ReadKey();
 		}
 
-		static void AdminPanel()
+        static void ErrorShow(string ErrorMessage) // добавить параметр действия
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.Write("Error! ");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine(ErrorMessage);
+            Console.WriteLine();
+            Console.Write("Press Enter to start over...");
+            Console.ReadKey();
+        }
+
+        static void AdminPanel()
 		{
 			bool AdminPanelDisabled = true;
 			string AdminPanelLabel = "===== АДМИН-ПАНЕЛЬ =====";
