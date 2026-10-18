@@ -9,7 +9,7 @@ namespace ATM
 		static int AccountChoice = new Random().Next(0, 3);
 		static string[] AccountNames = { "Ivan Petrov", "Maria Sidorova", "Alexey Kozlov" } ;
 		static decimal[] Balances = { 15000m, 8500m, 32000m };
-		static string[] History = new string[2_000_000_000];
+		static string[] History = new string[1_000];
 		static bool AdminPanelCanShow = true;
 		static int ActionChoice = -1;
 		static int ExitConfirm = -1;
@@ -24,7 +24,7 @@ namespace ATM
 			if (DateTime.Now.Hour >= 5 && DateTime.Now.Hour < 11) TimeOfDay = "morning";
 			else if (DateTime.Now.Hour >= 11 && DateTime.Now.Hour < 17) TimeOfDay = "afternoon";
 			else if (DateTime.Now.Hour >= 17 && DateTime.Now.Hour < 23) TimeOfDay = "evening";
-			else TimeOfDay = "nigt";
+			else TimeOfDay = "night";
 
 			// Main program loop
 			while (ActionChoice != 0 && ExitConfirm != 1)
@@ -32,13 +32,13 @@ namespace ATM
 				// Start program
 				Console.Clear();
 				Console.WriteLine($"===== Good {TimeOfDay}, {AccountNames[AccountChoice]}! =====");
-				Console.WriteLine($"Your balance: {Balances[AccountChoice]}");
+				Console.WriteLine($"Your current balance: {Balances[AccountChoice]}");
 				Console.WriteLine();
-				Console.WriteLine("Choose the action:");
-				Console.WriteLine("1. Withdrawn");
-				Console.WriteLine("2. Top up");
+				Console.WriteLine("Choose an action:");
+				Console.WriteLine("1. Withdraw");
+				Console.WriteLine("2. Deposit");
 				Console.WriteLine("3. Transfer between accounts");
-				Console.WriteLine("4. Operation hystory");
+				Console.WriteLine("4. Operation history");
 				Console.WriteLine("0. Exit");
 				Console.WriteLine();
 				Console.WriteLine("====================");
@@ -53,10 +53,10 @@ namespace ATM
 				}
 				if ((ActionChoice < 0 || ActionChoice > 4) && ActionChoice != 1488) ErrorShow("Invalid input.");
 				Console.Clear();
-				if (ActionChoice == 1) Withdrawn();
-				else if (ActionChoice == 2) TopUp();
-				else if (ActionChoice == 3) TransferBetweenAccouts();
-				else if (ActionChoice == 4) OperationHistory();
+				if (ActionChoice == 1) Withdraw();
+				else if (ActionChoice == 2) Deposit();
+				else if (ActionChoice == 3) TransferBetweenAccounts();
+				else if (ActionChoice == 4) ShowOperationHistory();
 				else if (ActionChoice == 0) Exit();
 				else if (ActionChoice == 1488)
 				{
@@ -66,44 +66,44 @@ namespace ATM
 			}
 		}
 
-		static void Withdrawn()
+		static void Withdraw()
 		{
-            Console.WriteLine("===== WITHDRAWN =====");
+            Console.WriteLine("===== WITHDRAW =====");
 			Console.WriteLine($"Balance: {Balances[AccountChoice]}");
 			Console.WriteLine();
-			Console.Write("Enter the withdrawal amount (the amount must be a multiple of 100): ");
+			Console.Write("Enter the amount to withdraw (the amount must be a multiple of 100): ");
 
-            // Value validity check
-            if (!decimal.TryParse(Console.ReadLine(), out decimal WithdrawnAmount))
+			// Value validity check
+			if (!decimal.TryParse(Console.ReadLine(), out decimal WithdrawAmount))
 			{
 				ErrorShow("Invalid input.");
 				return;
 			}
-			if (WithdrawnAmount < 0)
+			if (WithdrawAmount <= 0)
 			{
-				ErrorShow("You cannot withdraw a negative amount..");
+				ErrorShow("The withdraw amount must be greater than zero.");
 				return;
 			}
-			if (WithdrawnAmount % 100 != 0)
+			if (WithdrawAmount % 100 != 0)
 			{
 				ErrorShow("The amount must be a multiple of 100.");
 				return;
 			}
-			if (WithdrawnAmount > Balances[AccountChoice])
+			if (WithdrawAmount > Balances[AccountChoice])
 			{
 				ErrorShow("Insufficient funds.");
 				return;
 			}
 
             // Successful cash withdrawal
-            Balances[AccountChoice] -= WithdrawnAmount;
+            Balances[AccountChoice] -= WithdrawAmount;
 			Console.Clear();
             Console.WriteLine("===== WITHDRAWN =====");
             Console.WriteLine($"Balance: {Balances[AccountChoice]}");
             Console.WriteLine();
-            Console.WriteLine($"Enter the withdrawal amount (the amount must be a multiple of 100): {WithdrawnAmount}");
+            Console.WriteLine($"Enter the amount to withdraw (the amount must be a multiple of 100): {WithdrawAmount}");
 			Console.ForegroundColor = ConsoleColor.Green;
-			Console.WriteLine($"You have successfully withdrawn {WithdrawnAmount}.");
+			Console.WriteLine($"You have successfully withdrawn {WithdrawAmount}.");
 			Console.ForegroundColor = ConsoleColor.White;
 			Console.WriteLine();
 			Console.Write("Press Enter to continue...");
@@ -114,40 +114,40 @@ namespace ATM
 			{
 				if (History[i] == null)
 				{
-                    History[i] = $"[{DateTime.Now.ToLongTimeString()}] Withdrawn -{WithdrawnAmount},00. (balance of funds: {Balances[AccountChoice]})";
+                    History[i] = $"[{DateTime.Now.ToLongTimeString()}] Withdrawn -{WithdrawAmount:F2}. (balance of funds: {Balances[AccountChoice]})";
                     break;
 				}
 			}
 		}
 
-		static void TopUp()
+		static void Deposit()
 		{
-            Console.WriteLine("===== TOP UP =====");
+            Console.WriteLine("===== DEPOSIT =====");
 			Console.WriteLine($"Balance: {Balances[AccountChoice]}");
 			Console.WriteLine();
-			Console.Write("Enter the amount to be topped up: ");
+			Console.Write("Enter the amount to deposit: ");
 
-            // Value validity check
-            if (!decimal.TryParse(Console.ReadLine(), out decimal TopUpAmount))
+			// Value validity check
+			if (!decimal.TryParse(Console.ReadLine(), out decimal DepositAmount))
 			{
 				ErrorShow("Invalid input.");
 				return;
 			}
-			if (TopUpAmount < 0)
+			if (DepositAmount <= 0)
 			{
-				ErrorShow("You can't top up the account for an amount less than 0.");
+				ErrorShow("The deposit amount must be greater than zero.");
 				return;
 			}
 
-            // Successful account top up
-            Balances[AccountChoice] += TopUpAmount;
+            // Successful account deposit
+            Balances[AccountChoice] += DepositAmount;
 			Console.Clear();
-			Console.WriteLine("===== TOP UP =====");
+			Console.WriteLine("===== DEPOSIT =====");
 			Console.WriteLine($"Balance: {Balances[AccountChoice]}");
 			Console.WriteLine();
-			Console.WriteLine($"Enter the amount to be topped up: {TopUpAmount}");
+			Console.WriteLine($"Enter the amount to deposit: {DepositAmount}");
 			Console.ForegroundColor = ConsoleColor.Green;
-			Console.WriteLine($"You have successfully topped up your account by {TopUpAmount}.");
+			Console.WriteLine($"You have successfully deposit your account by {DepositAmount}.");
 			Console.ForegroundColor = ConsoleColor.White;
 			Console.WriteLine();
 			Console.Write("Press Enter to continue...");
@@ -158,13 +158,13 @@ namespace ATM
 			{
 				if (History[i] == null)
 				{
-					History[i] = $"[{DateTime.Now.ToLongTimeString()}] Top Up +{TopUpAmount},00. (balance of funds: {Balances[AccountChoice]})";
+					History[i] = $"[{DateTime.Now.ToLongTimeString()}] deposit +{DepositAmount:F2}. (balance of funds: {Balances[AccountChoice]})";
 					break;
 				}
 			}
 		}
 
-		static void TransferBetweenAccouts()
+		static void TransferBetweenAccounts()
 		{
 			Console.WriteLine("===== TRANSFER BETWEEN ACCOUNTS =====");
 			Console.WriteLine($"Balance: {Balances[AccountChoice]}");
@@ -184,7 +184,7 @@ namespace ATM
 				return;
 			}
 			TransferAccount--;
-			if (TransferAccount < -1 || TransferAccount > 2)
+			if (TransferAccount <= -1 || TransferAccount > 2)
 			{
 				ErrorShow("Such an account doesn't exist.");
 				return;
@@ -195,25 +195,25 @@ namespace ATM
 				return;
 			}
 			Console.Write("Enter the transfer amount: ");
-			if (!decimal.TryParse(Console.ReadLine(), out decimal TransferSum))
+			if (!decimal.TryParse(Console.ReadLine(), out decimal TransferAmount))
 			{
 				ErrorShow("Invalid input.");
 				return;
 			}
-			if (TransferSum < 0)
+			if (TransferAmount <= 0)
 			{
-				ErrorShow("You can't transfer a negative amount.");
+				ErrorShow("The transfer amount must be greater than zero.");
 				return;
 			}
-			if (TransferSum > Balances[AccountChoice])
+			if (TransferAmount > Balances[AccountChoice])
 			{
 				ErrorShow("Insufficient funds.");
 				return;
 			}
 
             // Successful transfer between accounts
-            Balances[AccountChoice] -= TransferSum;
-			Balances[TransferAccount] += TransferSum;
+            Balances[AccountChoice] -= TransferAmount;
+			Balances[TransferAccount] += TransferAmount;
 			Console.Clear();
 			Console.WriteLine("===== TRANSFER BETWEEN ACCOUNTS =====");
 			Console.WriteLine($"Balance: {Balances[AccountChoice]}");
@@ -222,9 +222,9 @@ namespace ATM
 			for (int i = 0; i < AccountNames.Length; i++) if (i != AccountChoice) Console.WriteLine($"{i + 1}. {AccountNames[i]}");
 			Console.WriteLine();
 			Console.WriteLine($"Your choice: {TransferAccount + 1}");
-			Console.WriteLine($"Enter the transfer amount: {TransferSum}");
+			Console.WriteLine($"Enter the transfer amount: {TransferAmount}");
 			Console.ForegroundColor = ConsoleColor.Green;
-			Console.WriteLine($"You have successfully transferred {TransferSum} to the account \"{AccountNames[TransferAccount]}\".");
+			Console.WriteLine($"You have successfully transferred {TransferAmount} to the account \"{AccountNames[TransferAccount]}\".");
 			Console.ForegroundColor = ConsoleColor.White;
 			Console.WriteLine();
 			Console.Write("Press Enter to continue...");
@@ -235,28 +235,22 @@ namespace ATM
 			{
 				if (History[i] == null)
 				{
-					History[i] = $"[{DateTime.Now.ToLongTimeString()}] Transfer -{TransferSum},00. --> {AccountNames[TransferAccount]} (balance of funds: {Balances[AccountChoice]})";
+					History[i] = $"[{DateTime.Now.ToLongTimeString()}] Transfer -{TransferAmount:F2}. --> {AccountNames[TransferAccount]} (balance of funds: {Balances[AccountChoice]}:F2)";
 					break;
 				}
 			}
 		}
 
-		static void OperationHistory() // исправить
+		static void ShowOperationHistory()
 		{
 			Console.WriteLine("===== OPERATION HISTORY =====");
-			if (History[0] == null) ErrorShow("There are no operations yet..");
-
-            /*{
-				Console.ForegroundColor = ConsoleColor.Red;
-				Console.WriteLine();
-				Console.ForegroundColor = ConsoleColor.White;
-				Console.WriteLine();
-				Console.Write("Press Enter to continue...");
-				Console.ReadKey();
+			if (History[0] == null)
+			{
+				ErrorShow("There are no operations yet.");
 				return;
-			}*/
-            else
-            {
+			}
+			else
+			{
 				for (int i = 0; i < History.Length; i++)
 				{
 					if (History[i] == null) break;
@@ -268,15 +262,15 @@ namespace ATM
 			Console.ReadKey();
 		}
 
-        static void ErrorShow(string ErrorMessage) // добавить параметр действия
+        static void ErrorShow(string ErrorMessage)
         {
             Console.ForegroundColor = ConsoleColor.Red;
             Console.Write("Error! ");
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine(ErrorMessage);
             Console.WriteLine();
-            Console.Write("Press Enter to start over...");
-            Console.ReadKey();
+			Console.Write("Press Enter to start over...");
+			Console.ReadKey();
         }
 
         static void AdminPanel()
@@ -297,13 +291,13 @@ namespace ATM
 				}
 				Console.WriteLine();
 				Console.WriteLine();
-				Console.WriteLine("Enter 0 to exit.");
+				Console.WriteLine("Enter 0 to cancel.");
 				Console.Write("Enter the password to log in: ");
-				string Password = Console.ReadLine();
+				string Password = Console.ReadLine()!;
 				Console.WriteLine();
 
 				SHA256 sha256 = SHA256.Create();
-				byte[] Bytes = Encoding.UTF8.GetBytes(Password);
+				byte[] Bytes = Encoding.UTF8.GetBytes(Password!);
 				byte[] Hash = sha256.ComputeHash(Bytes);
 				sha256.Dispose();
 				string PasswordHash = BitConverter.ToString(Hash).ToLower().Replace("-", "");
@@ -321,7 +315,7 @@ namespace ATM
 					Console.WriteLine("The password is incorrect!");
 					Console.ForegroundColor = ConsoleColor.Cyan;
 					if (PasswordAttempts == 2) Console.Write("You have 2 attempts left.");
-					else if (PasswordAttempts == 1) Console.Write("You have 1 attempts left.");
+					else if (PasswordAttempts == 1) Console.Write("You have 1 attempt left.");
 					else if (PasswordAttempts == 0)
 					{
 						AdminPanelCanShow = false;
@@ -343,9 +337,9 @@ namespace ATM
 				}
 				Console.WriteLine();
 				Console.WriteLine();
-                Console.WriteLine("Choose the action:");
-                Console.WriteLine("1. Clearing the operation history");
-				Console.WriteLine("2. Balance change");
+                Console.WriteLine("Choose an action:");
+                Console.WriteLine("1. Clear operation history");
+				Console.WriteLine("2. Change balance");
 				Console.WriteLine("0. Exit");
 				Console.WriteLine();
 				Console.WriteLine("====================");
@@ -360,11 +354,11 @@ namespace ATM
 				Console.WriteLine();
 				Console.WriteLine();
 
-                // Clearing the operation history
+                // 1. Clear operation history
                 if (AdminChoice == 1)
 				{
 					int OperationHistory;
-					Console.WriteLine("Clearing the operation history:");
+					Console.WriteLine("Clear operation history:");
 					Console.WriteLine();
 					Console.WriteLine("Are you sure you want to clear the operation history?");
 					Console.WriteLine("1 - yes");
@@ -381,14 +375,15 @@ namespace ATM
 							Console.ForegroundColor = ConsoleColor.Red;
 							Console.Write("Error! ");
 							Console.ForegroundColor = ConsoleColor.White;
-							Console.Write("There are no operations.");
-							Console.ForegroundColor = ConsoleColor.Cyan;
+							Console.Write("There is no operation history to clear.");
+
+                            Console.ForegroundColor = ConsoleColor.Cyan;
 						}
 						else
 						{
 							for (int i = 0; i < History.Length; i++)
 							{
-								if (History[i] != null) History[i] = null;
+								if (History[i] != null) History[i] = null!;
 								else break;
 							}
 						}
@@ -396,14 +391,14 @@ namespace ATM
 					Console.ReadKey();
 				}
 
-                // Balance change
+                // 2. Change balance
                 if (AdminChoice == 2)
 				{
 					int BalanceChangeAccount, NewBalance;
 
-					Console.WriteLine("Balance change:");
+					Console.WriteLine("Change balance:");
 					Console.WriteLine();
-					Console.WriteLine("Select an account for balance change:");
+					Console.WriteLine("Select an account for Change balance:");
 					for (int i = 0; i < AccountNames.Length; i++)
 					{
 						if (i == 0) Console.WriteLine($"{i + 1}. {AccountNames[i]} \t\t {Balances[i]}");
@@ -417,12 +412,12 @@ namespace ATM
 					if (BalanceChangeAccount == 0) continue;
 					Console.WriteLine();
 					BalanceChangeAccount--;
-					Console.Write($"Enter the new balance for the account. \"{AccountNames[BalanceChangeAccount]}\": ");
+					Console.Write($"Enter the new balance for the account \"{AccountNames[BalanceChangeAccount]}\": ");
 					NewBalance = Convert.ToInt32(Console.ReadLine());
 					Console.WriteLine();
 					Balances[BalanceChangeAccount] = NewBalance;
 					Console.ForegroundColor = ConsoleColor.Green;
-					Console.Write($"You have successfully set up the balance in {NewBalance} for the account. \"{AccountNames[BalanceChangeAccount]}\".");
+					Console.Write($"The balance of {NewBalance} has been successfully set to \"{AccountNames[BalanceChangeAccount]}\".");
 					Console.ForegroundColor = ConsoleColor.Cyan;
 					Console.ReadKey();
 				}
@@ -439,13 +434,18 @@ namespace ATM
 			Console.WriteLine();
 			Console.WriteLine("====================");
 			Console.Write("Your choice: ");
-			if (!int.TryParse(Console.ReadLine(), out ExitConfirm) || ExitConfirm < 0 || ExitConfirm > 1) ErrorShow("Invalid input.");
-			else if (ExitConfirm == 1) return;
-			else
-			{
-				ActionChoice = -1;
-				ExitConfirm = -1;
-			}
+            if (!int.TryParse(Console.ReadLine(), out ExitConfirm) || ExitConfirm < 0 || ExitConfirm > 1)
+            {
+                ErrorShow("Invalid input.");
+                ActionChoice = -1;
+                ExitConfirm = -1;
+            }
+            else if (ExitConfirm == 1) Environment.Exit(0);
+            else
+            {
+                ActionChoice = -1;
+                ExitConfirm = -1;
+            }
 		}
 	}
 }
