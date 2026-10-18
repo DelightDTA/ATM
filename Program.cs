@@ -344,7 +344,11 @@ namespace ATM
 				Console.WriteLine();
 				Console.WriteLine("====================");
 				Console.Write("Your choice: ");
-				AdminChoice = Convert.ToInt32(Console.ReadLine());
+				if (!int.TryParse(Console.ReadLine(), out AdminChoice) || AdminChoice < 0 || AdminChoice > 2)
+				{
+					ErrorShow("Invalid input.");
+					AdminChoice = -1;
+				}
 				Console.Clear();
 				for (int i = 0; i < AdminPanelLabel.Length; i++)
 				{
@@ -357,7 +361,6 @@ namespace ATM
                 // 1. Clear operation history
                 if (AdminChoice == 1)
 				{
-					int OperationHistory;
 					Console.WriteLine("Clear operation history:");
 					Console.WriteLine();
 					Console.WriteLine("Are you sure you want to clear the operation history?");
@@ -366,8 +369,13 @@ namespace ATM
 					Console.WriteLine();
 					Console.WriteLine("====================");
 					Console.Write("Your choice: ");
-					OperationHistory = Convert.ToInt32(Console.ReadLine());
-					if (OperationHistory == 0) continue;
+					if (!int.TryParse(Console.ReadLine(), out int ClearOperationHistory) || ClearOperationHistory < 0 || ClearOperationHistory > 1)
+					{
+						ErrorShow("Invalid input.");
+						ClearOperationHistory = -1;
+						continue;
+					}
+					if (ClearOperationHistory == 0) continue;
 					else
 					{
 						if (History[0] == null)
@@ -394,8 +402,6 @@ namespace ATM
                 // 2. Change balance
                 if (AdminChoice == 2)
 				{
-					int BalanceChangeAccount, NewBalance;
-
 					Console.WriteLine("Change balance:");
 					Console.WriteLine();
 					Console.WriteLine("Select an account for Change balance:");
@@ -408,13 +414,18 @@ namespace ATM
 					Console.WriteLine();
 					Console.WriteLine("====================");
 					Console.Write("Your choice: ");
-					BalanceChangeAccount = Convert.ToInt32(Console.ReadLine());
-					if (BalanceChangeAccount == 0) continue;
+					if (!int.TryParse(Console.ReadLine(), out int BalanceChangeAccount) || BalanceChangeAccount < 0 || BalanceChangeAccount > AccountNames.Length)
+                    {
+                        ErrorShow("Invalid input.");
+                        BalanceChangeAccount = -1;
+                        continue;
+                    }
+                    if (BalanceChangeAccount == 0) continue;
 					Console.WriteLine();
 					BalanceChangeAccount--;
 					Console.Write($"Enter the new balance for the account \"{AccountNames[BalanceChangeAccount]}\": ");
-					NewBalance = Convert.ToInt32(Console.ReadLine());
-					Console.WriteLine();
+                    if (!decimal.TryParse(Console.ReadLine(), out decimal NewBalance)) ErrorShow("Invalid input.");
+                    Console.WriteLine();
 					Balances[BalanceChangeAccount] = NewBalance;
 					Console.ForegroundColor = ConsoleColor.Green;
 					Console.Write($"The balance of {NewBalance} has been successfully set to \"{AccountNames[BalanceChangeAccount]}\".");
