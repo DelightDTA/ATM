@@ -2,7 +2,7 @@
 
 Just a silly task for a autograde in mathematical modeling exam :3
 
-The executable file is located on the path below: `bin\Release\SingleFile\ATM.exe`
+The executable file is located at the path: `bin\Release\SingleFile\ATM.exe`
 
 **Requirements:**
  - .NET 8.0 Runtime for console apps
