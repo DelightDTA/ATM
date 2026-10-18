@@ -154,7 +154,7 @@ namespace ATM
 			Console.ReadKey();
 
             // Record operation in history
-            for (int i = 0; i < 256; i++)
+            for (int i = 0; i < History.Length; i++)
 			{
 				if (History[i] == null)
 				{
@@ -172,7 +172,7 @@ namespace ATM
 			Console.WriteLine("Select the account for the transfer:");
 
             // Display of all accounts except the current one.
-            for (int i = 0; i < 3; i++) if (i != AccountChoice) Console.WriteLine($"{i + 1}. {AccountNames[i]}");
+            for (int i = 0; i < AccountNames.Length; i++) if (i != AccountChoice) Console.WriteLine($"{i + 1}. {AccountNames[i]}");
 			Console.WriteLine("0. Exit");
 			Console.WriteLine();
 
@@ -219,10 +219,7 @@ namespace ATM
 			Console.WriteLine($"Balance: {Balances[AccountChoice]}");
 			Console.WriteLine();
 			Console.WriteLine("Select the account for the transfer:");
-			for (int i = 0; i < 3; i++)
-			{
-				if (i != AccountChoice) Console.WriteLine($"{i + 1}. {AccountNames[i]}");
-			}
+			for (int i = 0; i < AccountNames.Length; i++) if (i != AccountChoice) Console.WriteLine($"{i + 1}. {AccountNames[i]}");
 			Console.WriteLine();
 			Console.WriteLine($"Your choice: {TransferAccount + 1}");
 			Console.WriteLine($"Enter the transfer amount: {TransferSum}");
@@ -244,7 +241,7 @@ namespace ATM
 			}
 		}
 
-		static void OperationHistory()
+		static void OperationHistory() // исправить
 		{
 			Console.WriteLine("===== OPERATION HISTORY =====");
 			if (History[0] == null) ErrorShow("There are no operations yet..");
@@ -260,7 +257,7 @@ namespace ATM
 			}*/
             else
             {
-				for (int i = 0; i < 256; i++)
+				for (int i = 0; i < History.Length; i++)
 				{
 					if (History[i] == null) break;
 					Console.WriteLine($"{i + 1}. {History[i]}");
@@ -284,14 +281,14 @@ namespace ATM
 
         static void AdminPanel()
 		{
-			bool AdminPanelDisabled = true;
-			string AdminPanelLabel = "===== АДМИН-ПАНЕЛЬ =====";
+			bool AdminPanelIsEisabled = false;
+			string AdminPanelLabel = "===== ADMIN PANEL ===== ";
 			ConsoleColor[] Pattern = [ConsoleColor.Red, ConsoleColor.Yellow, ConsoleColor.Green, ConsoleColor.Cyan, ConsoleColor.Blue];
 			int PasswordAttempts = 3;
 			int AdminChoice = -1;
 			string CorrectPasswordHash = "4eb1b555c4a8e71516179ea34a0828272a95944411c4109f51cf7d621ba57044";
 
-			while (AdminPanelDisabled)
+			while (!AdminPanelIsEisabled)
 			{
 				for (int i = 0; i < AdminPanelLabel.Length; i++)
 				{
@@ -300,8 +297,8 @@ namespace ATM
 				}
 				Console.WriteLine();
 				Console.WriteLine();
-				Console.WriteLine("Введите 0 для выхода.");
-				Console.Write("Введите пароль для входа: ");
+				Console.WriteLine("Enter 0 to exit.");
+				Console.Write("Enter the password to log in: ");
 				string Password = Console.ReadLine();
 				Console.WriteLine();
 
@@ -311,7 +308,7 @@ namespace ATM
 				sha256.Dispose();
 				string PasswordHash = BitConverter.ToString(Hash).ToLower().Replace("-", "");
 
-				if (PasswordHash == CorrectPasswordHash) AdminPanelDisabled = false;
+				if (PasswordHash == CorrectPasswordHash) AdminPanelIsEisabled = true;
 				else if (Password == "0")
 				{
 					Console.ForegroundColor = ConsoleColor.White;
@@ -321,10 +318,10 @@ namespace ATM
 				{
 					PasswordAttempts--;
 					Console.ForegroundColor = ConsoleColor.Red;
-					Console.WriteLine("Пароль неправильный!");
+					Console.WriteLine("The password is incorrect!");
 					Console.ForegroundColor = ConsoleColor.Cyan;
-					if (PasswordAttempts == 2) Console.Write("У вас осталось 2 попытки.");
-					else if (PasswordAttempts == 1) Console.Write("У вас осталось 1 попытка.");
+					if (PasswordAttempts == 2) Console.Write("You have 2 attempts left.");
+					else if (PasswordAttempts == 1) Console.Write("You have 1 attempts left.");
 					else if (PasswordAttempts == 0)
 					{
 						AdminPanelCanShow = false;
@@ -346,13 +343,13 @@ namespace ATM
 				}
 				Console.WriteLine();
 				Console.WriteLine();
-				Console.WriteLine("Выберите действие:");
-				Console.WriteLine("1. Очистка истории операций");
-				Console.WriteLine("2. Изменение баланса");
-				Console.WriteLine("0. Выход");
+                Console.WriteLine("Choose the action:");
+                Console.WriteLine("1. Clearing the operation history");
+				Console.WriteLine("2. Balance change");
+				Console.WriteLine("0. Exit");
 				Console.WriteLine();
 				Console.WriteLine("====================");
-				Console.Write("Ваш выбор: ");
+				Console.Write("Your choice: ");
 				AdminChoice = Convert.ToInt32(Console.ReadLine());
 				Console.Clear();
 				for (int i = 0; i < AdminPanelLabel.Length; i++)
@@ -363,18 +360,18 @@ namespace ATM
 				Console.WriteLine();
 				Console.WriteLine();
 
-				// Очистка истории операций
-				if (AdminChoice == 1)
+                // Clearing the operation history
+                if (AdminChoice == 1)
 				{
 					int OperationHistory;
-					Console.WriteLine("Очистка истории операций:");
+					Console.WriteLine("Clearing the operation history:");
 					Console.WriteLine();
-					Console.WriteLine("Вы уверены, что хотите очистить историю операций?");
-					Console.WriteLine("1 - да");
-					Console.WriteLine("0 - нет");
+					Console.WriteLine("Are you sure you want to clear the operation history?");
+					Console.WriteLine("1 - yes");
+					Console.WriteLine("0 - no");
 					Console.WriteLine();
 					Console.WriteLine("====================");
-					Console.Write("Ваш выбор: ");
+					Console.Write("Your choice: ");
 					OperationHistory = Convert.ToInt32(Console.ReadLine());
 					if (OperationHistory == 0) continue;
 					else
@@ -382,14 +379,14 @@ namespace ATM
 						if (History[0] == null)
 						{
 							Console.ForegroundColor = ConsoleColor.Red;
-							Console.Write("Ошибка! ");
+							Console.Write("Error! ");
 							Console.ForegroundColor = ConsoleColor.White;
-							Console.Write("Операций нет.");
+							Console.Write("There are no operations.");
 							Console.ForegroundColor = ConsoleColor.Cyan;
 						}
 						else
 						{
-							for (int i = 0; i < 256; i++)
+							for (int i = 0; i < History.Length; i++)
 							{
 								if (History[i] != null) History[i] = null;
 								else break;
@@ -399,33 +396,33 @@ namespace ATM
 					Console.ReadKey();
 				}
 
-				// Изменение баланса
-				if (AdminChoice == 2)
+                // Balance change
+                if (AdminChoice == 2)
 				{
 					int BalanceChangeAccount, NewBalance;
 
-					Console.WriteLine("Изменение баланса:");
+					Console.WriteLine("Balance change:");
 					Console.WriteLine();
-					Console.WriteLine("Выберите счет для изменения баланса:");
-					for (int i = 0; i < 3; i++)
+					Console.WriteLine("Select an account for balance change:");
+					for (int i = 0; i < AccountNames.Length; i++)
 					{
 						if (i == 0) Console.WriteLine($"{i + 1}. {AccountNames[i]} \t\t {Balances[i]}");
 						else Console.WriteLine($"{i + 1}. {AccountNames[i]} \t {Balances[i]}");
 					}
-					Console.WriteLine("0. Выход");
+					Console.WriteLine("0. Exit");
 					Console.WriteLine();
 					Console.WriteLine("====================");
-					Console.Write("Ваш выбор: ");
+					Console.Write("Your choice: ");
 					BalanceChangeAccount = Convert.ToInt32(Console.ReadLine());
 					if (BalanceChangeAccount == 0) continue;
 					Console.WriteLine();
 					BalanceChangeAccount--;
-					Console.Write($"Введите новый баланс для аккаута \"{AccountNames[BalanceChangeAccount]}\": ");
+					Console.Write($"Enter the new balance for the account. \"{AccountNames[BalanceChangeAccount]}\": ");
 					NewBalance = Convert.ToInt32(Console.ReadLine());
 					Console.WriteLine();
 					Balances[BalanceChangeAccount] = NewBalance;
 					Console.ForegroundColor = ConsoleColor.Green;
-					Console.Write($"Вы успешно установили баланс в {NewBalance} для аккаута \"{AccountNames[BalanceChangeAccount]}\".");
+					Console.Write($"You have successfully set up the balance in {NewBalance} for the account. \"{AccountNames[BalanceChangeAccount]}\".");
 					Console.ForegroundColor = ConsoleColor.Cyan;
 					Console.ReadKey();
 				}
@@ -436,13 +433,13 @@ namespace ATM
 
 		static void Exit()
 		{
-			Console.WriteLine("Вы уверены, что хотите выйти?");
-			Console.WriteLine("1 - да");
-			Console.WriteLine("0 - нет");
+			Console.WriteLine("Are you sure you want to leave?");
+			Console.WriteLine("1 - yes");
+			Console.WriteLine("0 - no");
 			Console.WriteLine();
 			Console.WriteLine("====================");
-			Console.Write("Ваш выбор: ");
-			if (!int.TryParse(Console.ReadLine(), out ExitConfirm) || ExitConfirm < 0 || ExitConfirm > 1) ErrorShow("Неверный ввод.");
+			Console.Write("Your choice: ");
+			if (!int.TryParse(Console.ReadLine(), out ExitConfirm) || ExitConfirm < 0 || ExitConfirm > 1) ErrorShow("Invalid input.");
 			else if (ExitConfirm == 1) return;
 			else
 			{
